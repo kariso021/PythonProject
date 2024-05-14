@@ -21,22 +21,24 @@ player_obj = player.Player()
 enemies_list = [enemies.Enemy(x=random.randint(100, 400), y=-50) for _ in range(num_enemies)] #일단 테스트용으로 List로 만들었는데 Dictionary 를 통해서 수정하면 더 좋을거같음 적 종류같은거
 font = pygame.font.Font(None, 36)  # font지정해주는거
 
+
 def handle_events():
     global done
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             done = True
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_UP:
-                player_obj.move_up()
-            elif event.key == pygame.K_DOWN:
-                player_obj.move_down()
-            elif event.key==pygame.K_LEFT:
-                player_obj.move_left()
-            elif event.key==pygame.K_RIGHT:
-                player_obj.move_right()
-            elif event.key == pygame.K_SPACE:
-                player_obj.fire()
+
+    keys = pygame.key.get_pressed()  # 현재 눌려있는 키의 상태
+    if keys[pygame.K_UP]:
+        player_obj.move_up()
+    if keys[pygame.K_DOWN]:
+        player_obj.move_down()
+    if keys[pygame.K_LEFT]:
+        player_obj.move_left()
+    if keys[pygame.K_RIGHT]:
+        player_obj.move_right()
+    if keys[pygame.K_SPACE]:
+        player_obj.fire()
 
 
 def runGame():
