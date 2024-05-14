@@ -1,4 +1,4 @@
-# 메인 파일 -> command pattern 적용시켜서 리플레이 기능 만들까 생각중
+# 
 import random
 import pygame
 import player
@@ -50,6 +50,8 @@ def runGame():
         handle_events()
 
         player_obj.update_projectiles() 
+        
+        
         player_obj.draw(screen)
         for enemy in list(enemies_list):  
             enemy.move()
@@ -58,6 +60,15 @@ def runGame():
                 player_obj.take_damage(10)
                 enemies_list.remove(enemy)  # 충돌 처리 그냥 Enemy 삭제시키는 방향으로 함
                 player_obj.increase_score(100) #임시 score 확인용으로 만들어둔 코드
+                
+        # 투사체와 적의 충돌 처리
+        for projectile in player_obj.projectiles:
+            for enemy in list(enemies_list):
+                if projectile.check_collision(enemy):
+                    enemies_list.remove(enemy)
+                    player_obj.projectiles.remove(projectile)
+                    player_obj.increase_score(50)  # 적을 제거할 때 점수를 올림
+                    break
         
         player_obj.draw_score(screen,font)
         pygame.display.update()

@@ -1,5 +1,4 @@
-import pygame#아이템 아직 기능구현 딱히 안해둠 -> 아이템 기능 생각한 내용 -> 1. 총알 개수 늘리기 
-             #2. hp 회복 3. Replay 찬스 주는 아이템 만들기(Command 패턴 적용시 가능함)
+import pygame#아이템 아직 기능구현 딱히 안해둠 
 
 class Item:
     def __init__(self, x, y, image_path):#image_path='images/Plane_Forward.png' 이런식으로 imagepath 다르게 사용하시고
