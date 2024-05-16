@@ -78,7 +78,7 @@ class LoopingShooterEnemy(Enemy):
         self.shoot()
 
 class DownwardShooterEnemy(Enemy):
-    def __init__(self, image_path='images/DownwardShooterEnemy.png', x=0, y=0, width=100, height=100, speed=5, shooting_interval=50, hp=100):
+    def __init__(self, image_path='images/DownwardShooterEnemy.png', x=0, y=0, width=100, height=100, speed=1, shooting_interval=50, hp=100):
         super().__init__(image_path, x, y, width, height, speed,  hp)
         self.shooting_interval = shooting_interval
         self.shooting_timer = 0
