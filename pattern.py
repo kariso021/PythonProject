@@ -9,7 +9,7 @@ class PatternGenerator:
     def random_pattern(self, num_enemies):
         enemy_types = [ enemies.HomingEnemy, enemies.LoopingShooterEnemy, enemies.DownwardShooterEnemy]
         enemies_list = []
-        for _ in range(num_enemies):
+        for i in range(num_enemies):
             enemy_class = random.choice(enemy_types)
             if enemy_class == enemies.HomingEnemy:
                 enemy = enemy_class(target=self.target, screen_width=self.screen_width)
