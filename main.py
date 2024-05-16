@@ -16,9 +16,9 @@ clock = pygame.time.Clock()
 font = pygame.font.Font(None, 36)  # 폰트 설정
 
 # 플레이어 객체 초기화
-player_obj = player.Player(x=size[0]//2, y=size[1] - 50)  # 플레이어를 화면 아래 중앙에 배치
+player_obj = player.Player(x=size[0]//2, y=size[1] - 50)
 
-# 타겟 객체를 플레이어로 설정
+# 타겟 설정입니당
 pattern_generator = PatternGenerator(screen_width=size[0], target=player_obj)
 enemies_list = pattern_generator.random_pattern(random.randint(5, 10))  # 랜덤 패턴으로 초기화
 
@@ -41,7 +41,7 @@ def handle_events():
         player_obj.fire()
 
 def run_game():
-    global done  # 전역변수 사용 선언
+    global done  # 전역변수 global!
     while not done:
         clock.tick(30)
         screen.fill(BLACK)
@@ -56,8 +56,8 @@ def run_game():
             enemy.draw(screen)
             if player_obj.check_collision(enemy):
                 player_obj.take_damage(10)
-                enemies_list.remove(enemy)  # 충돌 처리: Enemy 삭제
-                player_obj.increase_score(100)  # 임시 score 확인용 코드
+                enemies_list.remove(enemy) 
+                #player_obj.increase_score(100)  # 임시 score 확인용 코드
                 
         # 투사체와 적의 충돌 처리
         for projectile in list(player_obj.projectiles):
@@ -71,9 +71,9 @@ def run_game():
         player_obj.draw_score(screen, font)
         pygame.display.update()
 
-        # 예시로 5초마다 패턴을 변경
+        # 5초마다 패턴 변경 pattern count 변수만 이용하면 됨 -> 이거 나중에 적 처치시로 바꿀거임
         if pygame.time.get_ticks() % 5000 < 30:
-            enemies_list.extend(pattern_generator.random_pattern(random.randint(5, 10)))
+            enemies_list.extend(pattern_generator.random_pattern(random.randint(5, 10)))#개체수
 
 run_game()
 pygame.quit()

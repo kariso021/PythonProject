@@ -18,7 +18,7 @@ class Enemy:
             self.image.fill((255, 0, 0))  # 기본 이미지: 빨간색 사각형
 
     def move(self):
-        self.y += self.speed
+        pass
 
     def draw(self, screen):
         screen.blit(self.image, (self.x, self.y))
