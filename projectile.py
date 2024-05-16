@@ -9,6 +9,7 @@ class Projectile: #투사체
         self.width = width
         self.height = height
         self.color = (255, 0, 0)
+        
     def move(self):
         self.y -= self.speed
 
@@ -19,3 +20,8 @@ class Projectile: #투사체
         projectile_rect = pygame.Rect(self.x, self.y, self.width, self.height)
         enemy_rect = pygame.Rect(otherActor.x, otherActor.y, otherActor.image.get_width(), otherActor.image.get_height())
         return projectile_rect.colliderect(enemy_rect)
+    
+    def set_color(self, newcolor):
+        self.color=newcolor
+        
+   

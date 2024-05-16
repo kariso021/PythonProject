@@ -1,8 +1,8 @@
-# 
-import random
 import pygame
+import random
 import player
 import enemies
+from pattern import PatternGenerator
 
 pygame.init()
 
@@ -13,14 +13,14 @@ screen = pygame.display.set_mode(size)
 
 done = False
 clock = pygame.time.Clock()
-font = pygame.font.Font(None, 36)  # 폰트설정
-num_enemies = random.randint(5, 10)
+font = pygame.font.Font(None, 36)  # 폰트 설정
 
+# 플레이어 객체 초기화
+player_obj = player.Player(x=size[0]//2, y=size[1] - 50)  # 플레이어를 화면 아래 중앙에 배치
 
-player_obj = player.Player()
-enemies_list = [enemies.Enemy(x=random.randint(100, 400), y=-50) for _ in range(num_enemies)] #일단 테스트용으로 List로 만들었는데 Dictionary 를 통해서 수정하면 더 좋을거같음 적 종류같은거
-font = pygame.font.Font(None, 36)  # font지정해주는거
-
+# 타겟 객체를 플레이어로 설정
+pattern_generator = PatternGenerator(screen_width=size[0], target=player_obj)
+enemies_list = pattern_generator.random_pattern(random.randint(5, 10))  # 랜덤 패턴으로 초기화
 
 def handle_events():
     global done
@@ -40,29 +40,27 @@ def handle_events():
     if keys[pygame.K_SPACE]:
         player_obj.fire()
 
-
-def runGame():
-    global done#전역변수 쓸때 해줘야하는거
+def run_game():
+    global done  # 전역변수 사용 선언
     while not done:
         clock.tick(30)
         screen.fill(BLACK)
         
         handle_events()
 
-        player_obj.update_projectiles() 
-        
-        
+        player_obj.update_projectiles()
         player_obj.draw(screen)
-        for enemy in list(enemies_list):  
+
+        for enemy in list(enemies_list):
             enemy.move()
             enemy.draw(screen)
             if player_obj.check_collision(enemy):
                 player_obj.take_damage(10)
-                enemies_list.remove(enemy)  # 충돌 처리 그냥 Enemy 삭제시키는 방향으로 함
-                player_obj.increase_score(100) #임시 score 확인용으로 만들어둔 코드
+                enemies_list.remove(enemy)  # 충돌 처리: Enemy 삭제
+                player_obj.increase_score(100)  # 임시 score 확인용 코드
                 
         # 투사체와 적의 충돌 처리
-        for projectile in player_obj.projectiles:
+        for projectile in list(player_obj.projectiles):
             for enemy in list(enemies_list):
                 if projectile.check_collision(enemy):
                     enemies_list.remove(enemy)
@@ -70,8 +68,12 @@ def runGame():
                     player_obj.increase_score(50)  # 적을 제거할 때 점수를 올림
                     break
         
-        player_obj.draw_score(screen,font)
+        player_obj.draw_score(screen, font)
         pygame.display.update()
 
-runGame()
+        # 예시로 5초마다 패턴을 변경
+        if pygame.time.get_ticks() % 5000 < 30:
+            enemies_list.extend(pattern_generator.random_pattern(random.randint(5, 10)))
+
+run_game()
 pygame.quit()
