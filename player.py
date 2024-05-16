@@ -13,6 +13,8 @@ class Player:
         self.heart_image = pygame.image.load('images/heart.png')
         self.heart_image = pygame.transform.scale(self.heart_image, (30, 30))  #하트사이즈
         self.score = score
+        self.fire_cooldown = 300  # 쿨타임 여기서 조정하면 됨 300기준으로 0.3초?
+        self.last_fire_time = 0
 
     def move_up(self):
         self.y -= 10
@@ -27,8 +29,11 @@ class Player:
         self.x += 10
 
     def fire(self):
-        new_projectile = Projectile(self.x + self.image.get_width() / 2, self.y)
-        self.projectiles.append(new_projectile)
+        current_time = pygame.time.get_ticks()
+        if current_time - self.last_fire_time >= self.fire_cooldown:
+            new_projectile = Projectile(self.x + self.image.get_width() / 2, self.y)
+            self.projectiles.append(new_projectile)
+            self.last_fire_time = current_time #발사시간 업데이트 시켜서 쿨타임주기
 
     def update_projectiles(self):
         for projectile in self.projectiles:

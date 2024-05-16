@@ -51,29 +51,31 @@ def run_game():
         player_obj.update_projectiles()
         player_obj.draw(screen)
 
+        # 플레이어와 적의 충돌 처리
         for enemy in list(enemies_list):
-            enemy.move()
+            enemy.update()
             enemy.draw(screen)
             if player_obj.check_collision(enemy):
                 player_obj.take_damage(10)
                 enemies_list.remove(enemy) 
-                #player_obj.increase_score(100)  # 임시 score 확인용 코드
-                
+
         # 투사체와 적의 충돌 처리
         for projectile in list(player_obj.projectiles):
             for enemy in list(enemies_list):
                 if projectile.check_collision(enemy):
-                    enemies_list.remove(enemy)
+                    enemy.take_damage(30)
+                    if not enemy.alive:
+                        enemies_list.remove(enemy)
+                        player_obj.increase_score(50)  # 적을 제거할 때 점수를 올림
                     player_obj.projectiles.remove(projectile)
-                    player_obj.increase_score(50)  # 적을 제거할 때 점수를 올림
-                    break
+                    break #루프 벗어나고 다음 투사체로
         
         player_obj.draw_score(screen, font)
         pygame.display.update()
 
         # 5초마다 패턴 변경 pattern count 변수만 이용하면 됨 -> 이거 나중에 적 처치시로 바꿀거임
         if pygame.time.get_ticks() % 5000 < 30:
-            enemies_list.extend(pattern_generator.random_pattern(random.randint(5, 10)))#개체수
+            enemies_list.extend(pattern_generator.random_pattern(random.randint(5, 10)))  # 개체수
 
 run_game()
 pygame.quit()

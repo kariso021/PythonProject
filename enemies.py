@@ -3,31 +3,41 @@ import random
 import math
 
 class Enemy:
-    def __init__(self, image_path=None, x=0, y=0, width=50, height=50, speed=5):
+    def __init__(self, image_path=None, x=0, y=0, width=50, height=50, speed=5,hp=10):
         self.x = x
         self.y = y
         self.width = width
         self.height = height
         self.speed = speed
+        self.hp=hp
+        self.alive = True  # 적이 살아 있는지 여부
 
         if image_path:
             self.image = pygame.image.load(image_path)
             self.image = pygame.transform.scale(self.image, (width, height))
         else:
             self.image = pygame.Surface((width, height))
-            self.image.fill((255, 0, 0))  # 기본 이미지: 빨간색 사각형
+            self.image.fill((255, 0, 0))  # 기본이미지생성자
 
     def move(self):
         pass
+    
+    def take_damage(self,damage):
+        self.hp-= damage
+        if(self.hp<=0):
+            self.destroy()
+    
+    def destroy(self):
+        self.alive=False
 
     def draw(self, screen):
         screen.blit(self.image, (self.x, self.y))
 
 class HomingEnemy(Enemy):
-    def __init__(self, target, screen_width, image_path='images/HomingEnemy.png', width=50, height=50, speed=5):
+    def __init__(self, target, screen_width, image_path='images/HomingEnemy.png', width=50, height=50, speed=5, hp=100):
         x = random.randint(0, screen_width - width)
         y = 0
-        super().__init__(image_path, x, y, width, height, speed)
+        super().__init__(image_path, x, y, width, height, speed, hp) #부모클래스 호출
         self.target = target
         self.calculate_direction()
 
@@ -46,10 +56,13 @@ class HomingEnemy(Enemy):
     def move(self):
         self.x += self.direction_x * self.speed
         self.y += self.direction_y * self.speed
+        
+    def update(self):
+        self.move()
 
 class LoopingShooterEnemy(Enemy):
-    def __init__(self, image_path='images/LoopingShooterEnemy.png', x=0, y=0, width=50, height=50, speed=5, shooting_interval=50):
-        super().__init__(image_path, x, y, width, height, speed)
+    def __init__(self, image_path='images/LoopingShooterEnemy.png', x=0, y=0, width=50, height=50, speed=5, shooting_interval=50, hp=100):
+        super().__init__(image_path, x, y, width, height, speed,  hp)
         self.shooting_interval = shooting_interval
         self.shooting_timer = 0
 
@@ -65,8 +78,8 @@ class LoopingShooterEnemy(Enemy):
         self.shoot()
 
 class DownwardShooterEnemy(Enemy):
-    def __init__(self, image_path='images/DownwardShooterEnemy.png', x=0, y=0, width=50, height=50, speed=5, shooting_interval=50):
-        super().__init__(image_path, x, y, width, height, speed)
+    def __init__(self, image_path='images/DownwardShooterEnemy.png', x=0, y=0, width=100, height=100, speed=5, shooting_interval=50, hp=100):
+        super().__init__(image_path, x, y, width, height, speed,  hp)
         self.shooting_interval = shooting_interval
         self.shooting_timer = 0
 
