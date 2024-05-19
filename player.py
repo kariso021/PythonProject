@@ -1,6 +1,6 @@
 # player.py 수정
 import pygame
-from projectile import Projectile
+from projectile import PlayerProjectile
 
 class Player:
     def __init__(self, image_path='images/Plane_Forward.png', x=230, y=400, width=60, height=45,hp=50, score=0):
@@ -31,7 +31,7 @@ class Player:
     def fire(self):
         current_time = pygame.time.get_ticks()
         if current_time - self.last_fire_time >= self.fire_cooldown:
-            new_projectile = Projectile(self.x + self.image.get_width() / 2, self.y)
+            new_projectile = PlayerProjectile(self.x + self.image.get_width() / 2, self.y)
             self.projectiles.append(new_projectile)
             self.last_fire_time = current_time #발사시간 업데이트 시켜서 쿨타임주기
 

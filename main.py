@@ -19,7 +19,7 @@ font = pygame.font.Font(None, 36)  # 폰트 설정
 player_obj = player.Player(x=size[0]//2, y=size[1] - 50)
 
 # 타겟 설정입니당
-pattern_generator = PatternGenerator(screen_width=size[0], target=player_obj)
+pattern_generator = PatternGenerator(screen_width=size[0],screen_height=size[1], target=player_obj)
 enemies_list = pattern_generator.random_pattern(random.randint(5, 10))  # 랜덤 패턴으로 초기화
 
 def handle_events():
@@ -41,7 +41,7 @@ def handle_events():
         player_obj.fire()
 
 def run_game():
-    global done  # 전역변수 global!
+    global done
     while not done:
         clock.tick(30)
         screen.fill(BLACK)
@@ -57,25 +57,31 @@ def run_game():
             enemy.draw(screen)
             if player_obj.check_collision(enemy):
                 player_obj.take_damage(10)
-                enemies_list.remove(enemy) 
+                enemies_list.remove(enemy)
+            
+            # 적의 투사체 업데이트 및 충돌 처리
+            for projectile in list(enemy.projectiles):
+                projectile.draw(screen)
+                if projectile.check_collision(player_obj):
+                    player_obj.take_damage(10)
+                    enemy.projectiles.remove(projectile)
 
-        # 투사체와 적의 충돌 처리
+        #  플레이어 투사체와 적의 충돌 처리
         for projectile in list(player_obj.projectiles):
             for enemy in list(enemies_list):
                 if projectile.check_collision(enemy):
                     enemy.take_damage(30)
                     if not enemy.alive:
                         enemies_list.remove(enemy)
-                        player_obj.increase_score(50)  # 적을 제거할 때 점수를 올림
+                        player_obj.increase_score(50)
                     player_obj.projectiles.remove(projectile)
-                    break #루프 벗어나고 다음 투사체로
-        
+                    break
+
         player_obj.draw_score(screen, font)
         pygame.display.update()
 
-        # 5초마다 패턴 변경 pattern count 변수만 이용하면 됨 -> 이거 나중에 적 처치시로 바꿀거임
-        if pygame.time.get_ticks() % 5000 < 30:
-            enemies_list.extend(pattern_generator.random_pattern(random.randint(5, 10)))  # 개체수
-
 run_game()
 pygame.quit()
+
+    #if pygame.time.get_ticks() % 5000 < 30:
+            #enemies_list.extend(pattern_generator.missile_pattern(random.randint(5, 10)))  # 개체수
