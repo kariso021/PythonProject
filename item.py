@@ -11,7 +11,6 @@ class Item:
     def draw(self, screen):
         screen.blit(self.image, (self.x, self.y))
         
-        
     def move(self):
         self.y += self.speed  # 적 일단 아래로 가게끔 구현 5정도 되면 부드러움
     

@@ -9,6 +9,8 @@ class Player:
         self.x = x
         self.y = y
         self.hp = hp
+        self.width=width
+        self.height=height
         self.projectiles = [] 
         self.heart_image = pygame.image.load('images/heart.png')
         self.heart_image = pygame.transform.scale(self.heart_image, (30, 30))  #하트사이즈
@@ -48,14 +50,11 @@ class Player:
         self.draw_hearts(screen)
     
     
-    
-        
-    
     def take_damage(self, amount):
         self.hp -= amount
         if self.hp <= 0:
             self.hp = 0 
-            
+    
     def draw_hearts(self, screen):
         for i in range(self.hp // 10):
             screen.blit(self.heart_image, (10 + i * 40, 450)) 

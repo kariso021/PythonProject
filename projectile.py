@@ -15,6 +15,9 @@ class BaseProjectile: #투사체 기본 클래스
             self.y -= self.speed
         elif self.direction == 'down':
             self.y += self.speed
+            
+    def setcolorgreen(self):
+        self.color=(0,128,0)
 
     def draw(self, screen):
         pygame.draw.rect(screen, self.color, pygame.Rect(self.x, self.y, self.width, self.height))

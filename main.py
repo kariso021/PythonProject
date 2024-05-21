@@ -39,6 +39,8 @@ def handle_events():
         player_obj.move_right()
     if keys[pygame.K_SPACE]:
         player_obj.fire()
+        
+        
 
 def run_game():
     global done
@@ -50,6 +52,8 @@ def run_game():
 
         player_obj.update_projectiles()
         player_obj.draw(screen)
+        
+        
 
         # 플레이어와 적의 충돌 처리
         for enemy in list(enemies_list):
@@ -59,12 +63,12 @@ def run_game():
                 player_obj.take_damage(10)
                 enemies_list.remove(enemy)
             
-            # 적의 투사체 업데이트 및 충돌 처리
-            for projectile in list(enemy.projectiles):
-                projectile.draw(screen)
-                if projectile.check_collision(player_obj):
-                    player_obj.take_damage(10)
-                    enemy.projectiles.remove(projectile)
+            if hasattr(enemy, 'projectiles'):
+                for projectile in list(enemy.projectiles):
+                    projectile.draw(screen)
+                    if projectile.check_collision(player_obj):
+                        player_obj.take_damage(10)
+                        enemy.projectiles.remove(projectile)
 
         #  플레이어 투사체와 적의 충돌 처리
         for projectile in list(player_obj.projectiles):
@@ -76,11 +80,16 @@ def run_game():
                         player_obj.increase_score(50)
                     player_obj.projectiles.remove(projectile)
                     break
+                
+        if pygame.time.get_ticks() % 5000 < 30:
+            enemies_list.extend(pattern_generator.missile_pattern(random.randint(5, 10)))  # 개체수
 
         player_obj.draw_score(screen, font)
         pygame.display.update()
 
 run_game()
+
+
 pygame.quit()
 
     #if pygame.time.get_ticks() % 5000 < 30:

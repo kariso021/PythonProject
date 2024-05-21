@@ -8,7 +8,7 @@ class PatternGenerator:
         self.target = target
 
     def random_pattern(self, num_enemies): #디버깅용으로 RandomPattern 만들어둔거라고 보면 됨 순차적으로 하는걸 목표로 둠
-        enemy_types = [enemies.DownwardShooterEnemy]
+        enemy_types = [enemies.LoopingShooterEnemy,enemies.DownwardShooterEnemy]
         enemies_list = []
         for i in range(num_enemies):
             enemy_class = random.choice(enemy_types)
