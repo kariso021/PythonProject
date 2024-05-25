@@ -147,13 +147,13 @@ def run_game():
                         break
 
             # 패턴 넘어가게 두는부분
-            if not enemies_list and current_pattern_index < len(pattern_list):
+            if not enemies_list and current_pattern_index < len(pattern_list) - 1:
                 current_pattern_index += 1
                 enemies_list = pattern_list[current_pattern_index]()
-                
+
             # 클리어 조건 
-            if current_pattern_index==len(pattern_list): 
-                game_state = GAME_STATE_ENDGAME
+            if not enemies_list and current_pattern_index == len(pattern_list) - 1:
+                game_state = GAME_STATE_CLEARGAME
 
             # 미사일 에너미는 일정 시간 간격으로 계속 생성
             if pygame.time.get_ticks() % 5000 < 30:
