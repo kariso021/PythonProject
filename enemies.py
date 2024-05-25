@@ -47,7 +47,7 @@ class MissileEnemy(Enemy):
         self.target = target
         self.calculate_direction()
 
-    def calculate_direction(self):
+    def calculate_direction(self): #정규화
         target_x, target_y = self.target.x, self.target.y
         direction_x = target_x - self.x
         direction_y = target_y - self.y
@@ -78,14 +78,14 @@ class LoopingShooterEnemy(Enemy):
         self.points = [
             (150, 150),
             (screen_width - 150, 150),
-            (screen_width - 150, screen_height - 150),
-            (150, screen_height - 150)
+            (screen_width - 150, screen_height - 250),
+            (150, screen_height - 250)
         ]
         self.current_point = 0 
         self.moving_to_initial = True
         self.calculate_direction_to_point()
 
-    def calculate_direction_to_point(self):
+    def calculate_direction_to_point(self): # 정규화
         target_x, target_y = self.points[self.current_point]
         direction_x = target_x - self.x
         direction_y = target_y - self.y
@@ -109,7 +109,7 @@ class LoopingShooterEnemy(Enemy):
             self.x += self.direction_x * self.speed
             self.y += self.direction_y * self.speed
             if math.sqrt((self.points[self.current_point][0] - self.x)**2 + (self.points[self.current_point][1] - self.y)**2) < self.speed:
-                self.current_point = (self.current_point + 1) % len(self.points)
+                self.current_point = (self.current_point + 1) % len(self.points)#여기서 selfpoint 의 주소값 자체를 하나 옮김
                 self.calculate_direction_to_point()
 
     def shoot(self):
@@ -127,23 +127,27 @@ class LoopingShooterEnemy(Enemy):
             projectile.move()
 
 class DownwardShooterEnemy(Enemy):
-    def __init__(self, screen_width, screen_height, image_path='images/DownwardShooterEnemy.png', x=0, y=0, width=100, height=100, speed=1, shooting_interval=50, hp=100, can_shoot=True):
+    def __init__(self, screen_width, screen_height, image_path='images/DownwardShooterEnemy.png', x=0, y=0,targetpoint=0, width=100, height=100, speed=3, shooting_interval=50, hp=100, can_shoot=True):
         super().__init__(image_path, x, y, width, height, speed, hp, can_shoot)
         self.shooting_interval = shooting_interval
         self.shooting_timer = 0
         self.screen_width = screen_width
         self.screen_height = screen_height
+        self.afterspeed=1
+        self.reach_to_target=False
         self.projectiles = []
 
         self.points = [
-            (50, 50),
-            (screen_width - 50, 50)
+            (100, 50),
+            (200,50),
+            (300,50),
+            (400,50)
         ]
-        self.current_point = 0 
+        self.target_point = targetpoint 
         self.calculate_direction_to_point()
 
     def calculate_direction_to_point(self):
-        target_x, target_y = self.points[self.current_point]
+        target_x, target_y = self.points[self.target_point]
         direction_x = target_x - self.x
         direction_y = target_y - self.y
         distance = math.sqrt(direction_x**2 + direction_y**2)
@@ -155,15 +159,13 @@ class DownwardShooterEnemy(Enemy):
             self.direction_y = 1
 
     def move(self):
-        if self.current_point < len(self.points):
+        if self.reach_to_target==False:
             self.x += self.direction_x * self.speed
             self.y += self.direction_y * self.speed
-            if math.sqrt((self.points[self.current_point][0] - self.x)**2 + (self.points[self.current_point][1] - self.y)**2) < self.speed:
-                self.current_point += 1
-                if self.current_point < len(self.points):
-                    self.calculate_direction_to_point()
+            if math.sqrt((self.points[self.target_point][0] - self.x)**2 + (self.points[self.target_point][1] - self.y)**2) < self.speed:
+                self.reach_to_target=True
         else:
-            self.y += self.speed
+            self.y += self.afterspeed
 
     def shoot(self):
         if self.can_shoot and self.shooting_timer >= self.shooting_interval:
@@ -176,4 +178,66 @@ class DownwardShooterEnemy(Enemy):
         self.shooting_timer += 1
         self.shoot()
         for projectile in self.projectiles:
+            projectile.move()
+            
+            
+            
+class BossEnemy(Enemy):
+    def __init__(self, screen_width, screen_height, image_path='images/Boss.png', x=0, y=0, width=300, height=100, speed=5, shooting_interval=20, hp=500, can_shoot=True):
+        super().__init__(image_path, x, y, width, height, speed, hp, can_shoot)
+        self.shooting_interval = shooting_interval
+        self.shooting_timer = 0
+        self.screen_width = screen_width
+        self.screen_height = screen_height
+
+        # 초기좌표 설정하기
+        self.points = [
+            (0, 0),
+            (screen_width - 200, 0)
+        ]
+        self.current_point = 0 
+        self.moving_to_initial = True
+        self.calculate_direction_to_point()
+
+    def calculate_direction_to_point(self): # 정규화
+        target_x, target_y = self.points[self.current_point]
+        direction_x = target_x - self.x
+        direction_y = target_y - self.y
+        distance = math.sqrt(direction_x**2 + direction_y**2)
+        if distance != 0:
+            self.direction_x = direction_x / distance
+            self.direction_y = direction_y / distance
+        else:
+            self.direction_x = 0
+            self.direction_y = 1
+
+    def move(self):
+        if self.moving_to_initial:
+            self.x += self.direction_x * self.speed
+            self.y += self.direction_y * self.speed
+            if math.sqrt((self.points[self.current_point][0] - self.x)**2 + (self.points[self.current_point][1] - self.y)**2) < self.speed:
+                self.moving_to_initial = False
+                self.current_point = (self.current_point + 1) % len(self.points)
+                self.calculate_direction_to_point()
+        else:
+            self.x += self.direction_x * self.speed
+            self.y += self.direction_y * self.speed
+            if math.sqrt((self.points[self.current_point][0] - self.x)**2 + (self.points[self.current_point][1] - self.y)**2) < self.speed:
+                self.current_point = (self.current_point + 1) % len(self.points)#여기서 selfpoint 의 주소값 자체를 하나 옮김
+                self.calculate_direction_to_point()
+
+    def shoot(self):
+        if self.can_shoot and self.shooting_timer >= self.shooting_interval:
+            projectile = EnemyProjectile(self.x + self.width // 3, self.y + self.height)
+            self.projectiles.append(projectile)
+            projectile = EnemyProjectile(self.x + self.width // 3*2, self.y + self.height)
+            self.projectiles.append(projectile)
+            self.shooting_timer = 0
+
+    def update(self):
+        self.move()
+        self.shooting_timer += 1
+        self.shoot()
+        for projectile in self.projectiles:
+            projectile.setcolorgreen()
             projectile.move()
