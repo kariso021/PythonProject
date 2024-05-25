@@ -39,6 +39,7 @@ missile_enemies_list = []
 GAME_STATE_TITLE = 0
 GAME_STATE_PLAYING = 1
 GAME_STATE_ENDGAME = 2
+GAME_STATE_CLEARGAME = 3
 game_state = GAME_STATE_TITLE
 
 def handle_events():
@@ -106,12 +107,13 @@ def run_game():
                 #스크린 넘어가면 삭제 처리해야함(스테이지 못넘어감)
                 if enemy.y > size[1]:
                     enemies_list.remove(enemy)
+            
 
             # 플레이어 투사체와 적의 충돌 처리
             for projectile in list(player_obj.projectiles):
                 for enemy in list(enemies_list):
                     if projectile.check_collision(enemy):
-                        enemy.take_damage(30)
+                        enemy.take_damage(1000)
                         if not enemy.alive:
                             enemies_list.remove(enemy)
                             player_obj.increase_score(50)
@@ -145,9 +147,13 @@ def run_game():
                         break
 
             # 패턴 넘어가게 두는부분
-            if not enemies_list and current_pattern_index < len(pattern_list) - 1:
+            if not enemies_list and current_pattern_index < len(pattern_list):
                 current_pattern_index += 1
                 enemies_list = pattern_list[current_pattern_index]()
+                
+            # 클리어 조건 
+            if current_pattern_index==len(pattern_list): 
+                game_state = GAME_STATE_ENDGAME
 
             # 미사일 에너미는 일정 시간 간격으로 계속 생성
             if pygame.time.get_ticks() % 5000 < 30:
@@ -159,6 +165,9 @@ def run_game():
             player_obj.draw_score(screen, font)
         elif game_state == GAME_STATE_ENDGAME:
             screens.draw_endgame_screen(screen, size, font, player_obj.score)
+            
+        elif game_state == GAME_STATE_CLEARGAME:
+            screens.draw_endgame_clear_screen(screen, size, font, player_obj.score)
 
         pygame.display.update()
 
