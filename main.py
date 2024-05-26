@@ -111,7 +111,7 @@ def run_game():
             for projectile in list(player_obj.projectiles):
                 for enemy in list(enemies_list):
                     if projectile.check_collision(enemy):
-                        enemy.take_damage(1000)
+                        enemy.take_damage(100)  #Player Damage 따로 빼야 맞지만 그냥 여기다가 함
                         if not enemy.alive:
                             enemies_list.remove(enemy)
                             player_obj.increase_score(50)
@@ -130,7 +130,7 @@ def run_game():
                     for projectile in list(missile_enemy.projectiles):
                         projectile.draw(screen)
                         if projectile.check_collision(player_obj):
-                            player_obj.take_damage(10)
+                            player_obj.take_damage(20)
                             missile_enemy.projectiles.remove(projectile)
 
             for projectile in list(player_obj.projectiles):

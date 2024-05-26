@@ -1,10 +1,14 @@
+#screen.py
 import pygame
 
 WHITE = (255, 255, 255)
 
+background_image = pygame.image.load('images/background.png')
+
 def draw_title_screen(screen, size, font):
-    title_text = font.render("Space 1945 Game", True, WHITE)
-    start_text = font.render("Press SPACE to Start", True, WHITE)
+    title_text = font.render("", True, WHITE)#임시로 썼었음 -> 나중에 학번 적는데 써도 됨(아래서 위치 조정해서)
+    start_text = font.render("", True, WHITE)
+    screen.blit(background_image, (0, 0))
     screen.blit(title_text, (size[0] // 2 - title_text.get_width() // 2, size[1] // 2 - 50))
     screen.blit(start_text, (size[0] // 2 - start_text.get_width() // 2, size[1] // 2))
 
