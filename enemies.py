@@ -2,6 +2,7 @@ import pygame
 import random
 import math
 from projectile import EnemyProjectile
+from command import MoveEnemyCommand, ShootEnemyCommand
 
 class Enemy:
     def __init__(self, image_path=None, x=0, y=0, width=50, height=50, speed=5, hp=10, can_shoot=False):
@@ -11,16 +12,22 @@ class Enemy:
         self.height = height
         self.speed = speed
         self.hp = hp
-        self.alive = True  # 적이 살아 있는지 여부
+        self.alive = True
         self.can_shoot = can_shoot
-        self.projectiles = []  # 모든 적이 projectiles 속성을 가지도록 설정
+        self.projectiles = []
 
         if image_path:
             self.image = pygame.image.load(image_path)
             self.image = pygame.transform.scale(self.image, (width, height))
         else:
             self.image = pygame.Surface((width, height))
-            self.image.fill((255, 0, 0))  # 기본 이미지 생성자
+            self.image.fill((255, 0, 0))
+
+        self.move_command = MoveEnemyCommand(self)
+        if can_shoot:
+            self.shoot_command = ShootEnemyCommand(self)
+        else:
+            self.shoot_command = None
 
     def move(self):
         pass
@@ -37,7 +44,11 @@ class Enemy:
         screen.blit(self.image, (self.x, self.y))
 
     def update(self):
-        pass
+        self.move_command.execute()
+        if self.shoot_command:
+            self.shoot_command.execute()
+        for projectile in self.projectiles:
+            projectile.move()
 
 class MissileEnemy(Enemy):
     def __init__(self, target, screen_width, image_path='images/homingEnemy.png', width=50, height=50, speed=5, hp=100, can_shoot=False):
@@ -47,7 +58,7 @@ class MissileEnemy(Enemy):
         self.target = target
         self.calculate_direction()
 
-    def calculate_direction(self): #정규화
+    def calculate_direction(self):
         target_x, target_y = self.target.x, self.target.y
         direction_x = target_x - self.x
         direction_y = target_y - self.y
@@ -64,7 +75,7 @@ class MissileEnemy(Enemy):
         self.y += self.direction_y * self.speed
 
     def update(self):
-        self.move()
+        self.move_command.execute()
 
 class LoopingShooterEnemy(Enemy):
     def __init__(self, screen_width, screen_height, image_path='images/LoopingShooterEnemy.png', x=0, y=0, width=50, height=50, speed=5, shooting_interval=80, hp=100, can_shoot=True):
@@ -74,7 +85,7 @@ class LoopingShooterEnemy(Enemy):
         self.screen_width = screen_width
         self.screen_height = screen_height
 
-        # 초기좌표 설정하기
+        #Looping 을 하는 좌표들
         self.points = [
             (150, 150),
             (screen_width - 150, 150),
@@ -85,7 +96,7 @@ class LoopingShooterEnemy(Enemy):
         self.moving_to_initial = True
         self.calculate_direction_to_point()
 
-    def calculate_direction_to_point(self): # 정규화
+    def calculate_direction_to_point(self):
         target_x, target_y = self.points[self.current_point]
         direction_x = target_x - self.x
         direction_y = target_y - self.y
@@ -109,7 +120,7 @@ class LoopingShooterEnemy(Enemy):
             self.x += self.direction_x * self.speed
             self.y += self.direction_y * self.speed
             if math.sqrt((self.points[self.current_point][0] - self.x)**2 + (self.points[self.current_point][1] - self.y)**2) < self.speed:
-                self.current_point = (self.current_point + 1) % len(self.points)#여기서 selfpoint 의 주소값 자체를 하나 옮김
+                self.current_point = (self.current_point + 1) % len(self.points)
                 self.calculate_direction_to_point()
 
     def shoot(self):
@@ -119,29 +130,31 @@ class LoopingShooterEnemy(Enemy):
             self.shooting_timer = 0
 
     def update(self):
-        self.move()
+        self.move_command.execute()
         self.shooting_timer += 1
-        self.shoot()
+        if self.shooting_timer >= self.shooting_interval:
+            self.shoot_command.execute()
         for projectile in self.projectiles:
             projectile.setcolorgreen()
             projectile.move()
 
 class DownwardShooterEnemy(Enemy):
-    def __init__(self, screen_width, screen_height, image_path='images/DownwardShooterEnemy.png', x=0, y=0,targetpoint=0, width=100, height=100, speed=3, shooting_interval=50, hp=100, can_shoot=True):
+    def __init__(self, screen_width, screen_height, image_path='images/DownwardShooterEnemy.png', x=0, y=0, targetpoint=0, width=100, height=100, speed=3, shooting_interval=50, hp=100, can_shoot=True):
         super().__init__(image_path, x, y, width, height, speed, hp, can_shoot)
         self.shooting_interval = shooting_interval
         self.shooting_timer = 0
         self.screen_width = screen_width
         self.screen_height = screen_height
-        self.afterspeed=1
-        self.reach_to_target=False
+        self.afterspeed = 1
+        self.reach_to_target = False
         self.projectiles = []
 
+        #처음 좌표로 이동하는 부분들
         self.points = [
             (100, 50),
-            (200,50),
-            (300,50),
-            (400,50)
+            (200, 50),
+            (300, 50),
+            (400, 50)
         ]
         self.target_point = targetpoint 
         self.calculate_direction_to_point()
@@ -159,11 +172,11 @@ class DownwardShooterEnemy(Enemy):
             self.direction_y = 1
 
     def move(self):
-        if self.reach_to_target==False:
+        if self.reach_to_target == False:
             self.x += self.direction_x * self.speed
             self.y += self.direction_y * self.speed
             if math.sqrt((self.points[self.target_point][0] - self.x)**2 + (self.points[self.target_point][1] - self.y)**2) < self.speed:
-                self.reach_to_target=True
+                self.reach_to_target = True
         else:
             self.y += self.afterspeed
 
@@ -174,14 +187,13 @@ class DownwardShooterEnemy(Enemy):
             self.shooting_timer = 0
 
     def update(self):
-        self.move()
+        self.move_command.execute()
         self.shooting_timer += 1
-        self.shoot()
+        if self.shooting_timer >= self.shooting_interval:
+            self.shoot_command.execute()
         for projectile in self.projectiles:
             projectile.move()
-            
-            
-            
+
 class BossEnemy(Enemy):
     def __init__(self, screen_width, screen_height, image_path='images/Boss.png', x=0, y=0, width=300, height=100, speed=5, shooting_interval=20, hp=500, can_shoot=True):
         super().__init__(image_path, x, y, width, height, speed, hp, can_shoot)
@@ -190,7 +202,6 @@ class BossEnemy(Enemy):
         self.screen_width = screen_width
         self.screen_height = screen_height
 
-        # 초기좌표 설정하기
         self.points = [
             (0, 0),
             (screen_width - 200, 0)
@@ -199,7 +210,7 @@ class BossEnemy(Enemy):
         self.moving_to_initial = True
         self.calculate_direction_to_point()
 
-    def calculate_direction_to_point(self): # 정규화
+    def calculate_direction_to_point(self):
         target_x, target_y = self.points[self.current_point]
         direction_x = target_x - self.x
         direction_y = target_y - self.y
@@ -223,21 +234,22 @@ class BossEnemy(Enemy):
             self.x += self.direction_x * self.speed
             self.y += self.direction_y * self.speed
             if math.sqrt((self.points[self.current_point][0] - self.x)**2 + (self.points[self.current_point][1] - self.y)**2) < self.speed:
-                self.current_point = (self.current_point + 1) % len(self.points)#여기서 selfpoint 의 주소값 자체를 하나 옮김
+                self.current_point = (self.current_point + 1) % len(self.points)
                 self.calculate_direction_to_point()
 
     def shoot(self):
         if self.can_shoot and self.shooting_timer >= self.shooting_interval:
             projectile = EnemyProjectile(self.x + self.width // 3, self.y + self.height)
             self.projectiles.append(projectile)
-            projectile = EnemyProjectile(self.x + self.width // 3*2, self.y + self.height)
+            projectile = EnemyProjectile(self.x + 2 * self.width // 3, self.y + self.height)
             self.projectiles.append(projectile)
             self.shooting_timer = 0
 
     def update(self):
-        self.move()
+        self.move_command.execute()
         self.shooting_timer += 1
-        self.shoot()
+        if self.shooting_timer >= self.shooting_interval:
+            self.shoot_command.execute()
         for projectile in self.projectiles:
             projectile.setcolorgreen()
             projectile.move()

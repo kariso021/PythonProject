@@ -3,7 +3,7 @@ import random
 import player
 import enemies
 from pattern import PatternGenerator
-import screens  # Renamed module
+import screens
 
 pygame.init()
 
@@ -55,17 +55,17 @@ def handle_events():
                 reset_game()
 
     if game_state == GAME_STATE_PLAYING:
-        keys = pygame.key.get_pressed()  # 현재 눌려있는 키의 상태
+        keys = pygame.key.get_pressed()
         if keys[pygame.K_UP]:
-            player_obj.move_up()
+            player_obj.move_up_command.execute()
         if keys[pygame.K_DOWN]:
-            player_obj.move_down()
-        if keys[pygame.K_LEFT]:
-            player_obj.move_left()
+            player_obj.move_down_command.execute()
         if keys[pygame.K_RIGHT]:
-            player_obj.move_right()
+            player_obj.move_right_command.execute()
+        if keys[pygame.K_LEFT]:
+            player_obj.move_left_command.execute()
         if keys[pygame.K_SPACE]:
-            player_obj.fire()
+            player_obj.fire_command.execute()
 
 def reset_game():
     global player_obj, pattern_list, current_pattern_index, enemies_list, missile_enemies_list, game_state
@@ -89,7 +89,7 @@ def run_game():
             player_obj.update_projectiles()
             player_obj.draw(screen)
 
-            # 플레이어와 적의 충돌 처리
+            # 커맨드 패턴으로 애너미 관리
             for enemy in list(enemies_list):
                 enemy.update()
                 enemy.draw(screen)
@@ -103,13 +103,11 @@ def run_game():
                         if projectile.check_collision(player_obj):
                             player_obj.take_damage(10)
                             enemy.projectiles.remove(projectile)
-                    
-                #스크린 넘어가면 삭제 처리해야함(스테이지 못넘어감)
+
                 if enemy.y > size[1]:
                     enemies_list.remove(enemy)
-            
 
-            # 플레이어 투사체와 적의 충돌 처리
+            # PlayerProjectile 관리 부분
             for projectile in list(player_obj.projectiles):
                 for enemy in list(enemies_list):
                     if projectile.check_collision(enemy):
@@ -120,7 +118,7 @@ def run_game():
                         player_obj.projectiles.remove(projectile)
                         break
 
-            # 미사일 애너미 관리하는 부분
+            # 미사일(계속 주기적 생성되는건 따로 관리)
             for missile_enemy in list(missile_enemies_list):
                 missile_enemy.update()
                 missile_enemy.draw(screen)
@@ -134,8 +132,7 @@ def run_game():
                         if projectile.check_collision(player_obj):
                             player_obj.take_damage(10)
                             missile_enemy.projectiles.remove(projectile)
-                        
-  
+
             for projectile in list(player_obj.projectiles):
                 for missile_enemy in list(missile_enemies_list):
                     if projectile.check_collision(missile_enemy):
@@ -146,18 +143,18 @@ def run_game():
                         player_obj.projectiles.remove(projectile)
                         break
 
-            # 패턴 넘어가게 두는부분
+            # 패턴 조정하는거 -> 미사일에 구애 안받게 짜둠
             if not enemies_list and current_pattern_index < len(pattern_list) - 1:
                 current_pattern_index += 1
                 enemies_list = pattern_list[current_pattern_index]()
 
-            # 클리어 조건 
+            # 게임 클리어 조건
             if not enemies_list and current_pattern_index == len(pattern_list) - 1:
                 game_state = GAME_STATE_CLEARGAME
 
-            # 미사일 에너미는 일정 시간 간격으로 계속 생성
+            # 미사일 Enemy 일정 시간마다 계속 생성하는 부분
             if pygame.time.get_ticks() % 5000 < 30:
-                missile_enemies_list.extend(pattern_generator.missile_pattern(random.randint(5, 10)))  # 개체수
+                missile_enemies_list.extend(pattern_generator.missile_pattern(random.randint(5, 10)))
 
             if player_obj.hp <= 0:
                 game_state = GAME_STATE_ENDGAME
@@ -165,12 +162,10 @@ def run_game():
             player_obj.draw_score(screen, font)
         elif game_state == GAME_STATE_ENDGAME:
             screens.draw_endgame_screen(screen, size, font, player_obj.score)
-            
         elif game_state == GAME_STATE_CLEARGAME:
             screens.draw_endgame_clear_screen(screen, size, font, player_obj.score)
 
         pygame.display.update()
 
 run_game()
-
 pygame.quit()

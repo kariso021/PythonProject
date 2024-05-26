@@ -1,22 +1,30 @@
-# player.py 수정
+# player.py (modified to work with commands)
 import pygame
 from projectile import PlayerProjectile
+from command import MoveUpCommand, MoveDownCommand, MoveLeftCommand, MoveRightCommand, FireCommand
 
 class Player:
-    def __init__(self, image_path='images/Plane_Forward.png', x=230, y=400, width=60, height=45,hp=50, score=0):
+    def __init__(self, image_path='images/Plane_Forward.png', x=230, y=400, width=60, height=45, hp=50, score=0):
         self.image = pygame.image.load(image_path)
         self.image = pygame.transform.scale(self.image, (width, height))
         self.x = x
         self.y = y
         self.hp = hp
-        self.width=width
-        self.height=height
-        self.projectiles = [] 
+        self.width = width
+        self.height = height
+        self.projectiles = []
         self.heart_image = pygame.image.load('images/heart.png')
-        self.heart_image = pygame.transform.scale(self.heart_image, (30, 30))  #하트사이즈
+        self.heart_image = pygame.transform.scale(self.heart_image, (30, 30))
         self.score = score
-        self.fire_cooldown = 300  # 쿨타임 여기서 조정하면 됨 300기준으로 0.3초?
+        self.fire_cooldown = 300
         self.last_fire_time = 0
+        
+        #커맨드 패턴 적용하면서 따로 적용한 부분
+        self.move_up_command = MoveUpCommand(self)
+        self.move_down_command = MoveDownCommand(self)
+        self.move_left_command = MoveLeftCommand(self)
+        self.move_right_command = MoveRightCommand(self)
+        self.fire_command = FireCommand(self)
 
     def move_up(self):
         self.y -= 10
