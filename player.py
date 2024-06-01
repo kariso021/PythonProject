@@ -4,7 +4,7 @@ from projectile import PlayerProjectile
 from command import MoveUpCommand, MoveDownCommand, MoveLeftCommand, MoveRightCommand, FireCommand
 
 class Player:
-    def __init__(self, image_path='images/Plane_Forward.png', x=230, y=400, width=60, height=45, hp=50, score=0):
+    def __init__(self, image_path='images/Plane_Forward.png', x=230, y=400, width=60, height=45, hp=80, score=0):
         self.image = pygame.image.load(image_path)
         self.image = pygame.transform.scale(self.image, (width, height))
         self.x = x

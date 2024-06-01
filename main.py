@@ -20,7 +20,7 @@ font = pygame.font.Font(None, 36)  # 폰트 설정
 randomcount = 0
 
 # 배경 객체 초기화
-background = Background('images/skybg.png', size) #아직안함
+background = Background('images/skybg.png', size) 
 
 # 플레이어 객체 초기화
 player_obj = player.Player(x=size[0] // 2, y=size[1] - 50)
@@ -130,7 +130,7 @@ def run_game():
                 missile_enemy.update()
                 missile_enemy.draw(screen)
                 if player_obj.check_collision(missile_enemy):
-                    player_obj.take_damage(10)
+                    player_obj.take_damage(1)#미사일 에너미 데미지 부분인데 그냥 난이도 어려워서 1로 함
                     missile_enemies_list.remove(missile_enemy)
 
                 if hasattr(missile_enemy, 'projectiles'):

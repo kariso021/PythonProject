@@ -38,4 +38,10 @@ class PlayerProjectile(BaseProjectile):
 class EnemyProjectile(BaseProjectile):
     def __init__(self, x, y, speed=5, width=5, height=10):
         super().__init__(x, y, speed, width, height, color=(255, 255, 0), direction='down')
+        self.direction_x = 0
+        self.direction_y = 1
+
+    def move(self):
+        self.x += self.direction_x * self.speed
+        self.y += self.direction_y * self.speed
     

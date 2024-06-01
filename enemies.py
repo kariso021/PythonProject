@@ -199,6 +199,8 @@ class BossEnemy(Enemy):
         super().__init__(image_path, x, y, width, height, speed, hp, can_shoot)
         self.shooting_interval = shooting_interval
         self.shooting_timer = 0
+        self.bigshoot_interver= 200
+        self.bigshoot_timer= 0
         self.screen_width = screen_width
         self.screen_height = screen_height
 
@@ -239,17 +241,51 @@ class BossEnemy(Enemy):
 
     def shoot(self):
         if self.can_shoot and self.shooting_timer >= self.shooting_interval:
-            projectile = EnemyProjectile(self.x + self.width // 3, self.y + self.height)
-            self.projectiles.append(projectile)
-            projectile = EnemyProjectile(self.x + 2 * self.width // 3, self.y + self.height)
-            self.projectiles.append(projectile)
             self.shooting_timer = 0
+            if self.bigshoot_timer>=self.bigshoot_interver:
+                attack_pattern=self.big_shot
+                attack_pattern()
+                self.bigshoot_timer=0
+            else:
+                attack_pattern = random.choice([self.straight_shot, self.spread_shot, self.zigzag_shot])
+                attack_pattern()
+
+    def straight_shot(self):
+        projectile = EnemyProjectile(self.x + self.width // 3, self.y + self.height)
+        self.projectiles.append(projectile)
+        projectile = EnemyProjectile(self.x + 2 * self.width // 3, self.y + self.height)
+        self.projectiles.append(projectile)
+
+    def spread_shot(self):
+        for offset in range(-2, 3):
+            projectile = EnemyProjectile(self.x + self.width // 2, self.y + self.height, speed=5, width=5, height=10)
+            projectile.direction_x = offset * 0.2
+            projectile.direction_y = 1
+            self.projectiles.append(projectile)
+
+    def zigzag_shot(self):
+        projectile = EnemyProjectile(self.x + self.width // 3, self.y + self.height, speed=5, width=5, height=10)
+        projectile.direction = 'zigzag'
+        self.projectiles.append(projectile)
+        projectile = EnemyProjectile(self.x + 2 * self.width // 3, self.y + self.height, speed=5, width=5, height=10)
+        projectile.direction = 'zigzag'
+        self.projectiles.append(projectile)
+        
+        
+    def big_shot(self):
+        projectile = EnemyProjectile(self.x + self.width // 2, self.y + self.height)
+        projectile.width=50
+        projectile.height=50
+        self.projectiles.append(projectile)
 
     def update(self):
-        self.move_command.execute()
+        self.move()
         self.shooting_timer += 1
+        self.bigshoot_timer +=1
         if self.shooting_timer >= self.shooting_interval:
-            self.shoot_command.execute()
+            self.shoot()
         for projectile in self.projectiles:
-            projectile.setcolorgreen()
+            if projectile.direction == 'zigzag':
+                projectile.x += projectile.speed * math.sin(projectile.y / 20)#sin 값으로 왔다갔다 하게끔 하는것
             projectile.move()
+            projectile.setcolorgreen()
