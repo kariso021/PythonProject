@@ -214,6 +214,7 @@ class BossEnemy(Enemy):
 
     def calculate_direction_to_point(self):
         target_x, target_y = self.points[self.current_point]
+        #벡터개념
         direction_x = target_x - self.x
         direction_y = target_y - self.y
         distance = math.sqrt(direction_x**2 + direction_y**2)
