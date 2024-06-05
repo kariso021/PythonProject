@@ -3,6 +3,7 @@ import random
 import player
 import enemies
 from pattern import PatternGenerator
+from sound import Sound
 import screens
 from background import Background  # Background 클래스 임포트
 
@@ -12,7 +13,7 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 size = (500, 500)
 screen = pygame.display.set_mode(size)
-pygame.display.set_caption("My Game Title")
+pygame.display.set_caption("1945 with Python")
 
 done = False
 clock = pygame.time.Clock()
@@ -27,6 +28,9 @@ player_obj = player.Player(x=size[0] // 2, y=size[1] - 50)
 
 # 타겟 설정
 pattern_generator = PatternGenerator(screen_width=size[0], screen_height=size[1], target=player_obj)
+
+# 사운드 설정
+sound_bg = Sound('sound/bgmusic.wav')
 
 # 패턴 리스트 초기화
 pattern_list = [
@@ -55,6 +59,7 @@ def handle_events():
         if event.type == pygame.KEYDOWN:
             if game_state == GAME_STATE_TITLE and event.key == pygame.K_SPACE:
                 game_state = GAME_STATE_PLAYING
+                sound_bg.play()
             elif game_state == GAME_STATE_ENDGAME and event.key == pygame.K_r:
                 reset_game()
 
@@ -79,6 +84,7 @@ def reset_game():
     missile_enemies_list = []
     game_state = GAME_STATE_PLAYING
     background.y = 0
+    sound_bg.play()
 
 def run_game():
     global done, game_state, current_pattern_index, enemies_list, missile_enemies_list
@@ -165,6 +171,7 @@ def run_game():
 
             if player_obj.hp <= 0:
                 game_state = GAME_STATE_ENDGAME
+                sound_bg.stop()
 
             player_obj.draw_score(screen, font)
         elif game_state == GAME_STATE_ENDGAME:

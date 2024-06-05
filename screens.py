@@ -16,9 +16,11 @@ def draw_endgame_screen(screen, size, font, score):
     end_text = font.render("Game Over", True, WHITE)
     score_text = font.render(f"Score: {score}", True, WHITE)
     restart_text = font.render("Press R to Restart", True, WHITE)
+    replay_text = font.render("If you want replay, Press P",True,WHITE)
     screen.blit(end_text, (size[0] // 2 - end_text.get_width() // 2, size[1] // 2 - 50))
     screen.blit(score_text, (size[0] // 2 - score_text.get_width() // 2, size[1] // 2))
     screen.blit(restart_text, (size[0] // 2 - restart_text.get_width() // 2, size[1] // 2 + 50))
+    screen.blit(replay_text, (size[0] // 2 - replay_text.get_width() // 2, size[1] // 2 + 100))
     
 def draw_endgame_clear_screen(screen, size, font, score):
     end_text = font.render("Clear!!", True, WHITE)

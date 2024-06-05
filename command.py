@@ -4,6 +4,9 @@ class Command:
     def execute(self):
         pass
 
+    def log(self, timestamp):
+        return {'command': self.__class__.__name__, 'timestamp': timestamp}
+
 # 플레이어 커맨드
 class MoveUpCommand(Command):
     def __init__(self, player):
