@@ -5,7 +5,7 @@ import enemies
 from pattern import PatternGenerator
 from sound import Sound
 import screens
-from background import Background  # Background 클래스 임포트
+from background import Background
 
 pygame.init()
 
@@ -159,6 +159,7 @@ def run_game():
             # 패턴 조정하는거 -> 미사일에 구애 안받게 짜둠
             if not enemies_list and current_pattern_index < len(pattern_list) - 1:
                 current_pattern_index += 1
+                #current_pattern_index = 3
                 enemies_list = pattern_list[current_pattern_index]()
 
             # 게임 클리어 조건

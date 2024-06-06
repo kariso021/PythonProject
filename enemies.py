@@ -199,8 +199,8 @@ class BossEnemy(Enemy):
         super().__init__(image_path, x, y, width, height, speed, hp, can_shoot)
         self.shooting_interval = shooting_interval
         self.shooting_timer = 0
-        self.bigshoot_interver= 200
-        self.bigshoot_timer= 0
+        self.explosiveshoot_interval = 200
+        self.explosiveshoot_timer = 0
         self.screen_width = screen_width
         self.screen_height = screen_height
 
@@ -214,7 +214,6 @@ class BossEnemy(Enemy):
 
     def calculate_direction_to_point(self):
         target_x, target_y = self.points[self.current_point]
-        #벡터개념
         direction_x = target_x - self.x
         direction_y = target_y - self.y
         distance = math.sqrt(direction_x**2 + direction_y**2)
@@ -243,10 +242,9 @@ class BossEnemy(Enemy):
     def shoot(self):
         if self.can_shoot and self.shooting_timer >= self.shooting_interval:
             self.shooting_timer = 0
-            if self.bigshoot_timer>=self.bigshoot_interver:
-                attack_pattern=self.big_shot
-                attack_pattern()
-                self.bigshoot_timer=0
+            if self.explosiveshoot_timer >= self.explosiveshoot_interval:
+                self.explosive_shot()
+                self.explosiveshoot_timer = 0
             else:
                 attack_pattern = random.choice([self.straight_shot, self.spread_shot, self.zigzag_shot])
                 attack_pattern()
@@ -271,22 +269,30 @@ class BossEnemy(Enemy):
         projectile = EnemyProjectile(self.x + 2 * self.width // 3, self.y + self.height, speed=5, width=5, height=10)
         projectile.direction = 'zigzag'
         self.projectiles.append(projectile)
-        
-        
-    def big_shot(self):
-        projectile = EnemyProjectile(self.x + self.width // 2, self.y + self.height)
-        projectile.width=50
-        projectile.height=50
+
+    def explosive_shot(self):
+        projectile = EnemyProjectile(self.x + self.width // 2, self.y + self.height, explosive=True)
+        projectile.width = 50
+        projectile.height = 50
         self.projectiles.append(projectile)
 
     def update(self):
         self.move()
         self.shooting_timer += 1
-        self.bigshoot_timer +=1
+        self.explosiveshoot_timer += 1
         if self.shooting_timer >= self.shooting_interval:
             self.shoot()
+        new_projectiles = []
+        projectiles_to_remove = []
         for projectile in self.projectiles:
             if projectile.direction == 'zigzag':
-                projectile.x += projectile.speed * math.sin(projectile.y / 20)#sin 값으로 왔다갔다 하게끔 하는것
+                projectile.x += projectile.speed * math.sin(projectile.y / 20)
             projectile.move()
             projectile.setcolorgreen()
+            if projectile.should_explode():
+                new_projectiles.extend(projectile.split())
+                projectiles_to_remove.append(projectile)
+        
+        for projectile in projectiles_to_remove:
+            self.projectiles.remove(projectile)
+        self.projectiles.extend(new_projectiles)

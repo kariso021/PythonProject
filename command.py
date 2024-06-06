@@ -5,7 +5,7 @@ class Command:
         pass
 
     def log(self, timestamp):
-        return {'command': self.__class__.__name__, 'timestamp': timestamp}
+        return {'command': self.__class__.__name__, 'timestamp': timestamp} # 큐 형태의 작업공간에 저장을 시켜두는것
 
 # 플레이어 커맨드
 class MoveUpCommand(Command):
