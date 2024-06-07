@@ -108,14 +108,17 @@ class PlayingState(GameState):
                     if not missile_enemy.alive:
                         self.missile_enemies_list.remove(missile_enemy)
                         self.player.increase_score(50)
-                        self.game.score += 50 
-                    self.player.projectiles.remove(projectile)
+                        self.game.score += 50
+                    #두개 물체가 영역이 겹치면 오류 발생하길래 널체크용으로 조건문을 넣었음
+                    if(projectile in self.player.projectiles):
+                        self.player.projectiles.remove(projectile)
                     break
 
 
         # 패턴 관리 -> 순차적으로 실행
         if not self.enemies_list and self.current_pattern_index < len(self.pattern_list) - 1:
             self.current_pattern_index += 1
+            #self.current_pattern_index = 3
             self.enemies_list = self.pattern_list[self.current_pattern_index]()
 
         #패턴 완료시 ClearGameState 로 동기화

@@ -61,7 +61,7 @@ class EnemyProjectile(BaseProjectile):
                 if i == 0 and j == 0:
                     continue
                 new_projectile = EnemyProjectile(self.x, self.y, speed=5, width=5, height=10)
-                new_projectile.direction_x = i * 0.3
-                new_projectile.direction_y = j * 0.3
+                new_projectile.direction_x = i * 2.0 #speed of projectile
+                new_projectile.direction_y = j * 2.0
                 small_projectiles.append(new_projectile)
         return small_projectiles

@@ -1,5 +1,5 @@
 import pygame
-from game_state import TitleState
+from game_state import TitleState #이거 하나만 해도 부모클래스가 동일하기에 똑같은 인터페이스를 제공받음
 
 class Game:
     def __init__(self, size):
@@ -16,6 +16,7 @@ class Game:
         self.state = new_state
 
     def handle_events(self):
+        #pygame event 받는거
         events = pygame.event.get()
         for event in events:
             if event.type == pygame.QUIT:
