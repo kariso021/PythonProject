@@ -20,7 +20,7 @@ class Enemy:
             self.image = pygame.image.load(image_path)
             self.image = pygame.transform.scale(self.image, (width, height))
         else:
-            self.image = pygame.Surface((width, height))
+            self.image = pygame.Surface((width, height)) # imagth path 가 없을시 오류나는거 방지용으로 만들어둠
             self.image.fill((255, 0, 0))
 
         self.move_command = MoveEnemyCommand(self)

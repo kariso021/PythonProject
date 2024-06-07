@@ -121,7 +121,7 @@ class PlayingState(GameState):
             #self.current_pattern_index = 3
             self.enemies_list = self.pattern_list[self.current_pattern_index]()
 
-        #패턴 완료시 ClearGameState 로 동기화
+        #패턴 완료시 ClearGameState 로 상태 변환
         if not self.enemies_list and self.current_pattern_index == len(self.pattern_list) - 1:
             self.game.change_state(ClearGameState(self.game))
 

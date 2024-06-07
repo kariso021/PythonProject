@@ -42,7 +42,7 @@ class EnemyProjectile(BaseProjectile):
         self.direction_x = 0
         self.direction_y = 1
         self.explosive = explosive
-        self.explode_time = random.uniform(0.5 * 60, 1 * 60)  # 1.5초에서 3초 사이의 무작위 시간 (프레임 단위)
+        self.explode_time = random.uniform(0.5 * 60, 1 * 60)  # 0.5초에서 1초 사이의 무작위 시간 (프레임 단위)
         self.timer = 0
 
     def move(self):
