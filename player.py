@@ -89,7 +89,7 @@ class Player:
 
     def handle_item_collision(self, item):      # isinstance -> 객체가 특정 클래스 또는 클래스들의 인스턴스인지 여부를 확인
         if isinstance(item, HealthItem):
-            self.increase_health(20)
+            self.increase_health(10)
         elif isinstance(item, ScoreItem):
             self.increase_score(100)
         elif isinstance(item, SpeedItem):

@@ -68,7 +68,7 @@ class PlayingState(GameState):
     
     def spawn_item(self):
         current_time = time.time()
-        if current_time - self.last_item_spawn_time >= 5:  # 5초마다 아이템 스폰
+        if current_time - self.last_item_spawn_time >= 6:  # 6초마다 아이템 스폰
             x = random.randint(0, self.game.size[0])  # 화면 가로 크기 내에서 랜덤한 x 좌표
             item_type = random.choice([HealthItem, ScoreItem, SpeedItem])
             new_item = item_type(x, 0)
