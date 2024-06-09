@@ -1,10 +1,12 @@
 import pygame
+import time
 import random
 from player import Player
 from background import Background
 from pattern import PatternGenerator
 from sound import Sound
 import screens
+from item import HealthItem, ScoreItem, SpeedItem
 
 class GameState:
     def __init__(self, game):
@@ -43,6 +45,10 @@ class PlayingState(GameState):
         self.current_pattern_index = 0
         self.enemies_list = self.pattern_list[self.current_pattern_index]()
         self.missile_enemies_list = []
+        
+        self.items = []
+        self.last_item_spawn_time = time.time()         # 아이템 리스트 생성
+        
         self.sound_bg = Sound('sound/bgmusic.wav')
         self.sound_bg.play()
 
@@ -59,7 +65,16 @@ class PlayingState(GameState):
         if keys[pygame.K_SPACE]:
             self.player.fire_command.execute()
             
-            
+    
+    def spawn_item(self):
+        current_time = time.time()
+        if current_time - self.last_item_spawn_time >= 5:  # 5초마다 아이템 스폰
+            x = random.randint(0, self.game.size[0])  # 화면 가로 크기 내에서 랜덤한 x 좌표
+            item_type = random.choice([HealthItem, ScoreItem, SpeedItem])
+            new_item = item_type(x, 0)
+            self.items.append(new_item)
+            self.last_item_spawn_time = current_time
+
 
     def update(self):
         self.background.scroll()
@@ -131,6 +146,15 @@ class PlayingState(GameState):
         if self.player.hp <= 0:
             self.game.change_state(EndGameState(self.game))
             self.sound_bg.stop()
+        
+        self.spawn_item()            # 아이템 생성
+        
+        for item in self.items:      # 충돌처리
+            item.update()
+            if item.check_collision(self.player):
+                self.player.handle_item_collision(item)
+                self.items.remove(item)
+            
 
     def draw(self, screen):
         self.background.draw(screen)
@@ -144,6 +168,9 @@ class PlayingState(GameState):
             for projectile in missile_enemy.projectiles:
                 projectile.draw(screen)
         self.player.draw_score(screen, self.game.font)
+        
+        for item in self.items:         # 아이템 그리기
+            item.draw(screen)
 
 class EndGameState(GameState):
     def handle_events(self, events):

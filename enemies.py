@@ -51,7 +51,7 @@ class Enemy:
             projectile.move()
 
 class MissileEnemy(Enemy):
-    def __init__(self, target, screen_width, image_path='images/homingEnemy.png', width=50, height=50, speed=5, hp=100, can_shoot=False):
+    def __init__(self, target, screen_width, image_path='images/HomingEnemy.png', width=50, height=50, speed=5, hp=100, can_shoot=False):
         x = random.randint(0, screen_width - width)
         y = 0
         super().__init__(image_path, x, y, width, height, speed, hp, can_shoot)

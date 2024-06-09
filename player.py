@@ -2,14 +2,17 @@
 import pygame
 from projectile import PlayerProjectile
 from command import MoveUpCommand, MoveDownCommand, MoveLeftCommand, MoveRightCommand, FireCommand
+from item import HealthItem, ScoreItem, SpeedItem
 
 class Player:
-    def __init__(self, image_path='images/Plane_Forward.png', x=230, y=400, width=60, height=45, hp=80, score=0):
+    def __init__(self, image_path='images/Plane_Forward.png', x=230, y=400, width=60, height=45, hp=80, score=0, speed = 10):
         self.image = pygame.image.load(image_path)
         self.image = pygame.transform.scale(self.image, (width, height))
         self.x = x
         self.y = y
         self.hp = hp
+        self.max_health = 80        # 체력의 최대치 설정
+        self.speed = speed          # 속도 아이템을 위해 속도 추가
         self.width = width
         self.height = height
         self.projectiles = []
@@ -26,17 +29,17 @@ class Player:
         self.move_right_command = MoveRightCommand(self)
         self.fire_command = FireCommand(self)
 
-    def move_up(self):
-        self.y -= 10
+    def move_up(self):      # 속도 아이템을 위해 10 -> self.speed 로 변경
+        self.y -= self.speed
 
     def move_down(self):
-        self.y += 10
+        self.y += self.speed
 
     def move_left(self):
-        self.x -= 10
+        self.x -= self.speed
 
     def move_right(self):
-        self.x += 10
+        self.x += self.speed
 
     def fire(self):
         current_time = pygame.time.get_ticks()
@@ -72,6 +75,29 @@ class Player:
         enemy_rect = pygame.Rect(enemy.x, enemy.y, enemy.image.get_width(), enemy.image.get_height())
         return player_rect.colliderect(enemy_rect)
     
+    # 아이템 효과
+    def increase_health(self, amount):
+        self.hp += amount
+        if self.hp > self.max_health:
+            self.hp = self.max_health
+
+    def increase_score(self, amount):
+        self.score += amount
+
+    def increase_speed(self, amount):
+        self.speed += amount
+
+    def handle_item_collision(self, item):      # isinstance -> 객체가 특정 클래스 또는 클래스들의 인스턴스인지 여부를 확인
+        if isinstance(item, HealthItem):
+            self.increase_health(20)
+        elif isinstance(item, ScoreItem):
+            self.increase_score(100)
+        elif isinstance(item, SpeedItem):
+            self.increase_speed(2)
+    
+    def get_position_and_size(self):        
+        return self.x, self.y, self.width, self.height
+
     def increase_score(self, points):
         self.score += points
 
